@@ -101,7 +101,7 @@ constexpr  screen_settings_min_max sDRCMinMax = {
 #define TV_CONFIG_Y_OFFSET       "tvyoffset"
 
 #define DRC_CONFIG_WIDTH         "drcwidth"
-#define DRC_CONFIG_HEIGHT        "tvheight"
+#define DRC_CONFIG_HEIGHT        "drcheight"
 #define DRC_CONFIG_X_OFFSET      "drcxoffset"
 #define DRC_CONFIG_Y_OFFSET      "drcyoffset"
 #define CONFIG_FOREGROUND_SCREEN "foregroundscreen"
@@ -127,7 +127,7 @@ WUPSConfigAPICallbackStatus ConfigMenuOpenedCallback(WUPSConfigCategoryHandle ro
 void ConfigMenuClosedCallback();
 
 INITIALIZE_PLUGIN() {
-    WUPSConfigAPIOptionsV1 configOptions = {.name = "example_plugin_cpp"};
+    WUPSConfigAPIOptionsV1 configOptions = {.name = "VideoSquoosher"};
     if (WUPSConfigAPI_Init(configOptions, ConfigMenuOpenedCallback, ConfigMenuClosedCallback) !=
         WUPSCONFIG_API_RESULT_SUCCESS) {
         DEBUG_FUNCTION_LINE("Failed to init config api");
