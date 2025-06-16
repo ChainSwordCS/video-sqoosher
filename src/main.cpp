@@ -74,16 +74,16 @@ typedef struct screen_settings_ {
 } screen_settings;
 
 constexpr screen_settings_min_max sTVMinMax = {
-        .width    = {.min = 0, .max = 1280},
-        .height   = {.min = 0, .max = 720},
-        .x_offset = {.min = -1280, .max = 1280},
-        .y_offset = {.min = -720, .max = 720}};
+        .width    = {.min = 0, .max = 1920},
+        .height   = {.min = 0, .max = 1080},
+        .x_offset = {.min = -1920, .max = 1920},
+        .y_offset = {.min = -1080, .max = 1080}};
 
 constexpr  screen_settings_min_max sDRCMinMax = {
-        .width    = {.min = 0, .max = 1280},
-        .height   = {.min = 0, .max = 720},
-        .x_offset = {.min = -1280, .max = 1280},
-        .y_offset = {.min = -720, .max = 720}};
+        .width    = {.min = 0, .max = 1920},
+        .height   = {.min = 0, .max = 1080},
+        .x_offset = {.min = -1920, .max = 1920},
+        .y_offset = {.min = -1080, .max = 1080}};
 
 #define TV_DEFAULT_WIDTH         640
 #define TV_DEFAULT_HEIGHT        720
@@ -391,13 +391,13 @@ void copyToTexture(GX2ColorBuffer *sourceBuffer, GX2Texture *target) {
 
 void drawTexture(GX2Texture *texture, GX2Sampler *_sampler, float x, float y, int32_t width, int32_t height,
                  float alpha = 1.0f) {
-    float widthScaleFactor  = 1.0f / (float) 1280;
-    float heightScaleFactor = 1.0f / (float) 720;
+    float widthScaleFactor  = 1.0f / (float) 1920;
+    float heightScaleFactor = 1.0f / (float) 1080;
 
     auto positionOffsets = glm::vec3(0.0f);
 
-    positionOffsets[0] = (x - ((1280.0f) / 2) + (width / 2.0f)) * widthScaleFactor * 2.0f;
-    positionOffsets[1] = -(y - ((720.0f) / 2) + (height / 2.0f)) * heightScaleFactor * 2.0f;
+    positionOffsets[0] = (x - ((1920.0f) / 2) + (width / 2.0f)) * widthScaleFactor * 2.0f;
+    positionOffsets[1] = -(y - ((1080.0f) / 2) + (height / 2.0f)) * heightScaleFactor * 2.0f;
 
     glm::vec3 scale(width * widthScaleFactor, height * heightScaleFactor, 1.0f);
 
@@ -451,7 +451,7 @@ DECL_FUNCTION(void, GX2CopyColorBufferToScanBuffer, GX2ColorBuffer *cbuf, GX2Sca
 
             GX2InitColorBuffer(sMainColorBuffer,
                             GX2_SURFACE_DIM_TEXTURE_2D,
-                            1280, 720, 1,
+                            1920, 1080, 1,
                             GX2_SURFACE_FORMAT_UNORM_R8_G8_B8_A8,
                             (GX2AAMode) GX2_AA_MODE1X);
 
