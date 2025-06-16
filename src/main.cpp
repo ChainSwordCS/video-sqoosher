@@ -634,6 +634,7 @@ DECL_FUNCTION(void, GX2CopyColorBufferToScanBuffer, GX2ColorBuffer *cbuf, GX2Sca
     real_GX2CopyColorBufferToScanBuffer(cbuf, target);
 }
 
+/*
 DECL_FUNCTION(int32_t, VPADRead, VPADChan chan, VPADStatus *buffer, uint32_t buffer_size, VPADReadError *error) {
     VPADReadError real_error;
     int32_t result = real_VPADRead(chan, buffer, buffer_size, &real_error);
@@ -727,9 +728,10 @@ DECL_FUNCTION(int32_t, VPADRead, VPADChan chan, VPADStatus *buffer, uint32_t buf
 
     return result;
 }
+*/
 
 WUPS_MUST_REPLACE_FOR_PROCESS(GX2CopyColorBufferToScanBuffer, WUPS_LOADER_LIBRARY_GX2, GX2CopyColorBufferToScanBuffer,
                               WUPS_FP_TARGET_PROCESS_ALL);
 WUPS_MUST_REPLACE_FOR_PROCESS(GX2SetContextState, WUPS_LOADER_LIBRARY_GX2, GX2SetContextState,
                               WUPS_FP_TARGET_PROCESS_ALL);
-WUPS_MUST_REPLACE_FOR_PROCESS(VPADRead, WUPS_LOADER_LIBRARY_VPAD, VPADRead, WUPS_FP_TARGET_PROCESS_ALL);
+//WUPS_MUST_REPLACE_FOR_PROCESS(VPADRead, WUPS_LOADER_LIBRARY_VPAD, VPADRead, WUPS_FP_TARGET_PROCESS_ALL);
