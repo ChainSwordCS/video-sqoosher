@@ -395,11 +395,18 @@ void drawTexture(GX2Texture *texture, GX2Sampler *_sampler, float x, float y, in
     float heightScaleFactor = 1.0f / (float) 1080;
 
     auto positionOffsets = glm::vec3(0.0f);
+    float height_f = (float) height;
+    float width_f;
+    if (width == 641) { // lazy hack to fix gamepad aspect ratio (640.5 x 360)
+        width_f = 640.5f;
+    } else {
+        width_f = (float) width;
+    }
 
-    positionOffsets[0] = (x - ((1920.0f) / 2) + (width / 2.0f)) * widthScaleFactor * 2.0f;
-    positionOffsets[1] = -(y - ((1080.0f) / 2) + (height / 2.0f)) * heightScaleFactor * 2.0f;
+    positionOffsets[0] = (x - ((1920.0f) / 2) + (width_f / 2.0f)) * widthScaleFactor * 2.0f;
+    positionOffsets[1] = -(y - ((1080.0f) / 2) + (height_f / 2.0f)) * heightScaleFactor * 2.0f;
 
-    glm::vec3 scale(width * widthScaleFactor, height * heightScaleFactor, 1.0f);
+    glm::vec3 scale(width_f * widthScaleFactor, height_f * heightScaleFactor, 1.0f);
 
     Texture2DShader::instance()->setShaders();
     Texture2DShader::instance()->setAttributeBuffer();
