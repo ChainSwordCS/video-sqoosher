@@ -363,27 +363,12 @@ void copyToTexture(GX2ColorBuffer *sourceBuffer, GX2Texture *target) {
         tempSurface.aa = GX2_AA_MODE1X;
         GX2CalcSurfaceSizeAndAlignment(&tempSurface);
 
-
-        tempSurface.image = MEMAllocFromMappedMemoryForGX2Ex(
-                tempSurface.imageSize,
-                tempSurface.alignment);
-        if (tempSurface.image == nullptr) {
-            DEBUG_FUNCTION_LINE("VideoSquoosher: failed to allocate AA surface");
-            if (target->surface.image != nullptr) {
-                MEMFreeToMappedMemory(target->surface.image);
-                target->surface.image = nullptr;
-            }
-            return;
-        }
+        // reuse mainColorBuffer for this, instead of using more memory.
+        tempSurface.image = sMainColorBuffer->surface.image;
 
         // Resolve, then copy result to target
         GX2ResolveAAColorBuffer(sourceBuffer, &tempSurface, 0, 0);
         GX2CopySurface(&tempSurface, 0, 0, &target->surface, 0, 0);
-
-        if (tempSurface.image != nullptr) {
-            MEMFreeToMappedMemory(tempSurface.image);
-            tempSurface.image = nullptr;
-        }
         GX2DrawDone();
         GX2Invalidate(GX2_INVALIDATE_MODE_CPU, target->surface.image, target->surface.imageSize);
     }
