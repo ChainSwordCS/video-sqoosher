@@ -441,114 +441,144 @@ DECL_FUNCTION(void, GX2CopyColorBufferToScanBuffer, GX2ColorBuffer *cbuf, GX2Sca
     }
     if (!sMainColorBuffer || !sMainColorBuffer->surface.image) {
         freeUsedMemory();
-        sMainColorBuffer = (GX2ColorBuffer *) MEMAllocFromMappedMemoryForGX2Ex(sizeof(GX2ColorBuffer), 0x40);
 
-        GX2InitColorBuffer(sMainColorBuffer,
-                           GX2_SURFACE_DIM_TEXTURE_2D,
-                           1280, 720, 1,
-                           GX2_SURFACE_FORMAT_UNORM_R8_G8_B8_A8,
-                           (GX2AAMode) GX2_AA_MODE1X);
-
-        if (sMainColorBuffer->surface.imageSize) {
-            sMainColorBuffer->surface.image = MEMAllocFromMappedMemoryForGX2Ex(
-                    sMainColorBuffer->surface.imageSize,
-                    sMainColorBuffer->surface.alignment);
-            if (sMainColorBuffer->surface.image == nullptr) {
-                OSFatal("VideoSquoosher: Failed to alloc main_cbuf");
+        do {
+            sMainColorBuffer = (GX2ColorBuffer *) MEMAllocFromMappedMemoryForGX2Ex(sizeof(GX2ColorBuffer), 0x40);
+            if (sMainColorBuffer == nullptr) {
+                DEBUG_FUNCTION_LINE("VideoSquoosher: failed to alloc sMainColorBuffer");
+                break;
             }
 
-            DEBUG_FUNCTION_LINE("VideoSquoosher: allocated %dx%d cbuf %08X %08x",
-                                sMainColorBuffer->surface.width,
-                                sMainColorBuffer->surface.height,
-                                sMainColorBuffer->surface.image,
-                                sMainColorBuffer->surface.imageSize);
-        } else {
-            DEBUG_FUNCTION_LINE("VideoSquoosher: GX2InitTexture failed for main_cbuf!");
-        }
+            GX2InitColorBuffer(sMainColorBuffer,
+                            GX2_SURFACE_DIM_TEXTURE_2D,
+                            1280, 720, 1,
+                            GX2_SURFACE_FORMAT_UNORM_R8_G8_B8_A8,
+                            (GX2AAMode) GX2_AA_MODE1X);
 
-        sDRCTex = (GX2Texture *) MEMAllocFromMappedMemoryForGX2Ex(sizeof(GX2Texture), 0x40);
-        if (sDRCTex == nullptr) {
-            OSFatal("alloc drcTex failed");
-        }
-
-        GX2InitTexture(sDRCTex,
-                       854, 480, 1, 0,
-                       GX2_SURFACE_FORMAT_UNORM_R8_G8_B8_A8,
-                       GX2_SURFACE_DIM_TEXTURE_2D,
-                       GX2_TILE_MODE_LINEAR_ALIGNED);
-        sDRCTex->surface.use = (GX2SurfaceUse) (GX2_SURFACE_USE_COLOR_BUFFER | GX2_SURFACE_USE_TEXTURE);
-
-        if (sDRCTex->surface.imageSize) {
-            sDRCTex->surface.image = MEMAllocFromMappedMemoryForGX2Ex(
-                    sDRCTex->surface.imageSize,
-                    sDRCTex->surface.alignment);
-            if (sDRCTex->surface.image == nullptr) {
-                OSFatal("VideoSquoosher: Failed to alloc drcTex");
+            if (sMainColorBuffer->surface.imageSize) {
+                sMainColorBuffer->surface.image = MEMAllocFromMappedMemoryForGX2Ex(
+                        sMainColorBuffer->surface.imageSize,
+                        sMainColorBuffer->surface.alignment);
+                if (sMainColorBuffer->surface.image == nullptr) {
+                    DEBUG_FUNCTION_LINE("VideoSquoosher: Failed to alloc sMainColorBuffer->surface.image");
+                    break;
+                }
+                DEBUG_FUNCTION_LINE("VideoSquoosher: allocated %dx%d cbuf %08X %08x",
+                                    sMainColorBuffer->surface.width,
+                                    sMainColorBuffer->surface.height,
+                                    sMainColorBuffer->surface.image,
+                                    sMainColorBuffer->surface.imageSize);
+            } else {
+                DEBUG_FUNCTION_LINE("VideoSquoosher: Failed to alloc sMainColorBuffer->surface.image");
+                break;
             }
 
-            GX2Invalidate(GX2_INVALIDATE_MODE_CPU, sDRCTex->surface.image, sDRCTex->surface.imageSize);
-            DEBUG_FUNCTION_LINE("VideoSquoosher: allocated %dx%d drcTex %08X",
-                                sDRCTex->surface.width,
-                                sDRCTex->surface.height,
-                                sDRCTex->surface.image);
-        } else {
-            DEBUG_FUNCTION_LINE("VideoSquoosher: GX2InitTexture failed for drcTex!");
-        }
-        DCFlushRange(sDRCTex, sizeof(GX2Texture));
-
-        sTVTex = (GX2Texture *) MEMAllocFromMappedMemoryForGX2Ex(sizeof(GX2Texture), 0x40);
-        if (sTVTex == nullptr) {
-            OSFatal("alloc tvTex failed");
-        }
-
-        GX2InitTexture(sTVTex,
-                       1280, 720, 1, 0,
-                       GX2_SURFACE_FORMAT_UNORM_R8_G8_B8_A8,
-                       GX2_SURFACE_DIM_TEXTURE_2D,
-                       GX2_TILE_MODE_LINEAR_ALIGNED);
-        sTVTex->surface.use = (GX2SurfaceUse) (GX2_SURFACE_USE_COLOR_BUFFER | GX2_SURFACE_USE_TEXTURE);
-
-        if (sTVTex->surface.imageSize) {
-            sTVTex->surface.image = MEMAllocFromMappedMemoryForGX2Ex(
-                    sTVTex->surface.imageSize,
-                    sTVTex->surface.alignment);
-            if (sTVTex->surface.image == nullptr) {
-                OSFatal("VideoSquoosher: Failed to alloc tvTex");
+            sDRCTex = (GX2Texture *) MEMAllocFromMappedMemoryForGX2Ex(sizeof(GX2Texture), 0x40);
+            if (sDRCTex == nullptr) {
+                DEBUG_FUNCTION_LINE("VideoSquoosher: Failed to alloc sDRCTex");
+                break;
             }
 
-            DEBUG_FUNCTION_LINE("VideoSquoosher: allocated %dx%d tvTex %08X",
-                                sTVTex->surface.width,
-                                sTVTex->surface.height,
-                                sTVTex->surface.image);
-        } else {
-            DEBUG_FUNCTION_LINE("VideoSquoosher: GX2InitTexture failed for tvTex!");
+            GX2InitTexture(sDRCTex,
+                        854, 480, 1, 0,
+                        GX2_SURFACE_FORMAT_UNORM_R8_G8_B8_A8,
+                        GX2_SURFACE_DIM_TEXTURE_2D,
+                        GX2_TILE_MODE_LINEAR_ALIGNED);
+            sDRCTex->surface.use = (GX2SurfaceUse) (GX2_SURFACE_USE_COLOR_BUFFER | GX2_SURFACE_USE_TEXTURE);
+
+            if (sDRCTex->surface.imageSize) {
+                sDRCTex->surface.image = MEMAllocFromMappedMemoryForGX2Ex(
+                        sDRCTex->surface.imageSize,
+                        sDRCTex->surface.alignment);
+                if (sDRCTex->surface.image == nullptr) {
+                    DEBUG_FUNCTION_LINE("VideoSquoosher: Failed to alloc sDRCTex->surface.image");
+                }
+
+                GX2Invalidate(GX2_INVALIDATE_MODE_CPU, sDRCTex->surface.image, sDRCTex->surface.imageSize);
+                DEBUG_FUNCTION_LINE("VideoSquoosher: allocated %dx%d drcTex %08X",
+                                    sDRCTex->surface.width,
+                                    sDRCTex->surface.height,
+                                    sDRCTex->surface.image);
+            } else {
+                DEBUG_FUNCTION_LINE("VideoSquoosher: Failed to alloc sDRCTex->surface.image");
+                break;
+            }
+            DCFlushRange(sDRCTex, sizeof(GX2Texture));
+
+            sTVTex = (GX2Texture *) MEMAllocFromMappedMemoryForGX2Ex(sizeof(GX2Texture), 0x40);
+            if (sTVTex == nullptr) {
+                DEBUG_FUNCTION_LINE("VideoSquoosher: Failed to alloc sTVTex");
+                break;
+            }
+
+            GX2InitTexture(sTVTex,
+                        1280, 720, 1, 0,
+                        GX2_SURFACE_FORMAT_UNORM_R8_G8_B8_A8,
+                        GX2_SURFACE_DIM_TEXTURE_2D,
+                        GX2_TILE_MODE_LINEAR_ALIGNED);
+            sTVTex->surface.use = (GX2SurfaceUse) (GX2_SURFACE_USE_COLOR_BUFFER | GX2_SURFACE_USE_TEXTURE);
+
+            if (sTVTex->surface.imageSize) {
+                sTVTex->surface.image = MEMAllocFromMappedMemoryForGX2Ex(
+                        sTVTex->surface.imageSize,
+                        sTVTex->surface.alignment);
+                if (sTVTex->surface.image == nullptr) {
+                    DEBUG_FUNCTION_LINE("VideoSquoosher: Failed to alloc sTVTex->surface.image");
+                    break;
+                }
+
+                DEBUG_FUNCTION_LINE("VideoSquoosher: allocated %dx%d tvTex %08X",
+                                    sTVTex->surface.width,
+                                    sTVTex->surface.height,
+                                    sTVTex->surface.image);
+            } else {
+                DEBUG_FUNCTION_LINE("VideoSquoosher: Failed to alloc sTVTex->surface.image");
+                break;
+            }
+
+            sSampler = (GX2Sampler *) MEMAllocFromMappedMemoryForGX2Ex(sizeof(GX2Sampler), 0x40);
+            if (sSampler == nullptr) {
+                DEBUG_FUNCTION_LINE("VideoSquoosher: Failed to alloc sSampler");
+                break;
+            }
+
+            GX2InitSampler(sSampler,
+                        GX2_TEX_CLAMP_MODE_CLAMP,
+                        GX2_TEX_XY_FILTER_MODE_LINEAR);
+
+            DCFlushRange(sSampler, sizeof(GX2Sampler));
+            GX2Invalidate(GX2_INVALIDATE_MODE_CPU_TEXTURE, sSampler, sizeof(GX2Sampler));
+
+            sOwnContextState = (GX2ContextState *) MEMAllocFromMappedMemoryForGX2Ex(
+                    sizeof(GX2ContextState),
+                    GX2_CONTEXT_STATE_ALIGNMENT);
+            if (sOwnContextState == nullptr) {
+                DEBUG_FUNCTION_LINE("VideoSquoosher: Failed to alloc sOwnContextState");
+                break;
+            }
+
+            GX2SetupContextStateEx(sOwnContextState, GX2_TRUE);
+            DCInvalidateRange(sOwnContextState, sizeof(GX2ContextState)); // Important!
+
+            real_GX2SetContextState(sOwnContextState);
+            GX2SetColorBuffer(sMainColorBuffer, GX2_RENDER_TARGET_0);
+            real_GX2SetContextState(sOriginalContextState);
+        } while (false); // this is a oneshot do-while block because we break out upon errors, btw.
+
+        if (sMainColorBuffer == nullptr ||
+            sMainColorBuffer->surface.image == nullptr ||
+            sTVTex == nullptr ||
+            sTVTex->surface.image == nullptr ||
+            sDRCTex == nullptr ||
+            sDRCTex->surface.image == nullptr ||
+            sOwnContextState == nullptr ||
+            sSampler == nullptr) {
+            
+            freeUsedMemory();
+            // doesn't matter whether we return inside or outside this block
+            //real_GX2CopyColorBufferToScanBuffer(cbuf, target);
+            //return;
         }
-
-        sSampler = (GX2Sampler *) MEMAllocFromMappedMemoryForGX2Ex(sizeof(GX2Sampler), 0x40);
-        if (sSampler == nullptr) {
-            OSFatal("alloc sampler failed");
-        }
-
-        GX2InitSampler(sSampler,
-                       GX2_TEX_CLAMP_MODE_CLAMP,
-                       GX2_TEX_XY_FILTER_MODE_LINEAR);
-
-        DCFlushRange(sSampler, sizeof(GX2Sampler));
-        GX2Invalidate(GX2_INVALIDATE_MODE_CPU_TEXTURE, sSampler, sizeof(GX2Sampler));
-
-        sOwnContextState = (GX2ContextState *) MEMAllocFromMappedMemoryForGX2Ex(
-                sizeof(GX2ContextState),
-                GX2_CONTEXT_STATE_ALIGNMENT);
-        if (sOwnContextState == nullptr) {
-            OSFatal("VideoSquoosher: Failed to alloc ownContextState");
-        }
-
-        GX2SetupContextStateEx(sOwnContextState, GX2_TRUE);
-        DCInvalidateRange(sOwnContextState, sizeof(GX2ContextState)); // Important!
-
-        real_GX2SetContextState(sOwnContextState);
-        GX2SetColorBuffer(sMainColorBuffer, GX2_RENDER_TARGET_0);
-        real_GX2SetContextState(sOriginalContextState);
     }
 
     if (sMainColorBuffer && sMainColorBuffer->surface.image) {
